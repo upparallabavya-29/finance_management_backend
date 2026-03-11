@@ -39,8 +39,38 @@ app.use(helmet({
 }));
 
 // Middleware
+// Normalize allowed origins by removing trailing slashes
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://finance-management-frontend-omega.vercel.app',
+    'https://finance-management-frontend-applica.vercel.app'
+].map(url => url.replace(/\/$/, ''));
+
+if (process.env.FRONTEND_URL) {
+    // If multiple URLs are provided via env variable, split them
+    const envOrigins = process.env.FRONTEND_URL.split(',').map(url => url.trim().replace(/\/$/, ''));
+    envOrigins.forEach((url) => {
+        if (url && !allowedOrigins.includes(url)) {
+            allowedOrigins.push(url);
+        }
+    });
+}
+
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Remove trailing slash from the request origin
+        const normalizedOrigin = origin.replace(/\/$/, '');
+
+        if (allowedOrigins.includes(normalizedOrigin)) {
+            callback(null, true);
+        } else {
+            console.warn(`[CORS] Rejected request from origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 };
 app.use(cors(corsOptions));
