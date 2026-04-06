@@ -20,8 +20,7 @@ class AuthRepository {
                 id: userId,
                 email: email,
                 first_name: firstName,
-                last_name: lastName,
-                password_hash: 'SYNCED_BY_AUTH_DO_NOT_USE'
+                last_name: lastName
             }])
             .select()
             .single();
@@ -52,8 +51,7 @@ class AuthRepository {
                 id: userId,
                 email: email,
                 first_name: firstName,
-                last_name: lastName,
-                password_hash: 'SYNCED_BY_AUTH_DO_NOT_USE'
+                last_name: lastName
             }])
             .select()
             .single();
